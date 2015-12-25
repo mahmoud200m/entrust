@@ -1,6 +1,8 @@
-<?php namespace Zizaco\Entrust;
+<?php
 
-/**
+namespace Zizaco\Entrust;
+
+/*
  * This file is part of Entrust,
  * a role & permission management solution for Laravel.
  *
@@ -21,8 +23,6 @@ class EntrustServiceProvider extends ServiceProvider
 
     /**
      * Bootstrap the application events.
-     *
-     * @return void
      */
     public function boot()
     {
@@ -38,8 +38,6 @@ class EntrustServiceProvider extends ServiceProvider
 
     /**
      * Register the service provider.
-     *
-     * @return void
      */
     public function register()
     {
@@ -52,8 +50,6 @@ class EntrustServiceProvider extends ServiceProvider
 
     /**
      * Register the application bindings.
-     *
-     * @return void
      */
     private function registerEntrust()
     {
@@ -64,23 +60,19 @@ class EntrustServiceProvider extends ServiceProvider
 
     /**
      * Register the artisan commands.
-     *
-     * @return void
      */
     private function registerCommands()
     {
-        $this->app->bindShared('command.entrust.migration', function ($app) {
-            return new MigrationCommand();
+        $this->app->singleton('command.entrust.migration', function ($app) {
+            return new MigrationCommand($app['config']);
         });
-        $this->app->bindShared('command.entrust.classes', function ($app) {
-            return new ClassCreatorCommand();
+        $this->app->singleton('command.entrust.classes', function ($app) {
+            return new ClassCreatorCommand($app['config']);
         });
     }
 
     /**
      * Merges user's and entrust's configs.
-     *
-     * @return void
      */
     private function mergeConfig()
     {
@@ -98,7 +90,7 @@ class EntrustServiceProvider extends ServiceProvider
     {
         return [
             'command.entrust.migration',
-            'command.entrust.classes'
+            'command.entrust.classes',
         ];
     }
 }
