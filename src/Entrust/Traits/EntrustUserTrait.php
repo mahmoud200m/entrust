@@ -1,6 +1,8 @@
-<?php namespace Zizaco\Entrust\Traits;
+<?php
 
-/**
+namespace Zizaco\Entrust\Traits;
+
+/*
  * This file is part of Entrust,
  * a role & permission management solution for Laravel.
  *
@@ -34,7 +36,7 @@ trait EntrustUserTrait
     {
         parent::boot();
 
-        static::deleting(function($user) {
+        static::deleting(function ($user) {
             if (!method_exists(Config::get('auth.model'), 'bootSoftDeletingTrait')) {
                 $user->roles()->sync([]);
             }
@@ -170,8 +172,8 @@ trait EntrustUserTrait
         // If validate all and there is a false in either
         // Check that if validate all, then there should not be any false.
         // Check that if not validate all, there must be at least one true.
-        if(($options['validate_all'] && !(in_array(false,$checkedRoles) || in_array(false,$checkedPermissions))) ||
-            (!$options['validate_all'] && (in_array(true,$checkedRoles) || in_array(true,$checkedPermissions)))) {
+        if (($options['validate_all'] && !(in_array(false, $checkedRoles) || in_array(false, $checkedPermissions))) ||
+            (!$options['validate_all'] && (in_array(true, $checkedRoles) || in_array(true, $checkedPermissions)))) {
             $validateAll = true;
         } else {
             $validateAll = false;
@@ -185,7 +187,6 @@ trait EntrustUserTrait
         } else {
             return [$validateAll, ['roles' => $checkedRoles, 'permissions' => $checkedPermissions]];
         }
-
     }
 
     /**
@@ -195,11 +196,11 @@ trait EntrustUserTrait
      */
     public function attachRole($role)
     {
-        if(is_object($role)) {
+        if (is_object($role)) {
             $role = $role->getKey();
         }
 
-        if(is_array($role)) {
+        if (is_array($role)) {
             $role = $role['id'];
         }
 
@@ -225,7 +226,7 @@ trait EntrustUserTrait
     }
 
     /**
-     * Attach multiple roles to a user
+     * Attach multiple roles to a user.
      *
      * @param mixed $roles
      */
@@ -237,7 +238,7 @@ trait EntrustUserTrait
     }
 
     /**
-     * Detach multiple roles from a user
+     * Detach multiple roles from a user.
      *
      * @param mixed $roles
      */
@@ -247,5 +248,4 @@ trait EntrustUserTrait
             $this->detachRole($role);
         }
     }
-
 }

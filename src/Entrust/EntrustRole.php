@@ -1,6 +1,8 @@
-<?php namespace Zizaco\Entrust;
+<?php
 
-/**
+namespace Zizaco\Entrust;
+
+/*
  * This file is part of Entrust,
  * a role & permission management solution for Laravel.
  *
@@ -34,5 +36,4 @@ class EntrustRole extends Model implements EntrustRoleInterface
         parent::__construct($attributes);
         $this->table = Config::get('entrust.roles_table');
     }
-
 }

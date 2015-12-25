@@ -17,17 +17,19 @@ use Illuminate\Config\Repository as Config;
 class MigrationCommand extends Command
 {
     /**
-     * Configuaration
+     * Configuaration.
+     *
      * @var [type]
      */
     protected $config;
 
     /**
-     * Entrust configuration & options
+     * Entrust configuration & options.
+     *
      * @var [type]
      */
     protected $options;
-    
+
     /**
      * The console command name.
      *
@@ -51,18 +53,19 @@ class MigrationCommand extends Command
 
     /**
      * Get authentication provider.
-     * @return Array
+     *
+     * @return array
      */
     public function getAuthProvider()
     {
         $guards = $this->config->get('auth.guards');
         if (!$guards) {
-            throw new Exception("Guard(s) not found");
+            throw new Exception('Guard(s) not found');
         }
         $guard = $this->choice('Which guard would you like to use?', array_keys($guards), 0);
         $guard = $this->config->get("auth.guards.{$guard}");
         if (!isset($guard['provider'])) {
-            throw new Exception("Provider not found");
+            throw new Exception('Provider not found');
         }
         $provider = $guard['provider'];
 
@@ -86,10 +89,9 @@ class MigrationCommand extends Command
                 if ($this->createMigration($path)) {
                     return $this->info('Migration successfully created!');
                 }
+
                 return $this->error("Couldn't create migration.");
             }
-
-
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
@@ -102,7 +104,6 @@ class MigrationCommand extends Command
      *
      * @return bool
      */
-    
     protected function createMigration($migrationFile)
     {
         $provider = $this->options['provider'];
@@ -147,10 +148,10 @@ class MigrationCommand extends Command
         if (!file_exists($migrationFile) && $fs = fopen($migrationFile, 'x')) {
             fwrite($fs, $output);
             fclose($fs);
+
             return true;
         }
 
         return false;
-
     }
 }

@@ -1,6 +1,8 @@
-<?php namespace Zizaco\Entrust\Traits;
+<?php
 
-/**
+namespace Zizaco\Entrust\Traits;
+
+/*
  * This file is part of Entrust,
  * a role & permission management solution for Laravel.
  *
@@ -44,7 +46,7 @@ trait EntrustRoleTrait
     {
         parent::boot();
 
-        static::deleting(function($role) {
+        static::deleting(function ($role) {
             if (!method_exists(Config::get('entrust.role'), 'bootSoftDeletingTrait')) {
                 $role->users()->sync([]);
                 $role->perms()->sync([]);
@@ -58,8 +60,6 @@ trait EntrustRoleTrait
      * Save the inputted permissions.
      *
      * @param mixed $inputPermissions
-     *
-     * @return void
      */
     public function savePermissions($inputPermissions)
     {
@@ -74,8 +74,6 @@ trait EntrustRoleTrait
      * Attach permission to current role.
      *
      * @param object|array $permission
-     *
-     * @return void
      */
     public function attachPermission($permission)
     {
@@ -94,16 +92,16 @@ trait EntrustRoleTrait
      * Detach permission form current role.
      *
      * @param object|array $permission
-     *
-     * @return void
      */
     public function detachPermission($permission)
     {
-        if (is_object($permission))
+        if (is_object($permission)) {
             $permission = $permission->getKey();
+        }
 
-        if (is_array($permission))
+        if (is_array($permission)) {
             $permission = $permission['id'];
+        }
 
         $this->perms()->detach($permission);
     }
@@ -112,8 +110,6 @@ trait EntrustRoleTrait
      * Attach multiple permissions to current role.
      *
      * @param mixed $permissions
-     *
-     * @return void
      */
     public function attachPermissions($permissions)
     {
@@ -123,11 +119,9 @@ trait EntrustRoleTrait
     }
 
     /**
-     * Detach multiple permissions from current role
+     * Detach multiple permissions from current role.
      *
      * @param mixed $permissions
-     *
-     * @return void
      */
     public function detachPermissions($permissions)
     {
