@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class EntrustSetupTables extends Migration
+class {{$name}} extends Migration
 {
     /**
      * Run the migrations.
@@ -19,16 +19,6 @@ class EntrustSetupTables extends Migration
             $table->string('display_name')->nullable();
             $table->string('description')->nullable();
             $table->timestamps();
-        });
-
-        // Create table for associating roles to users (Many-to-Many)
-        Schema::create('{{ $roleUserPivotTable['name'] }}', function (Blueprint $table) {
-            @foreach ($roleUserPivotTable['fkeys'] as $fkey)
-            $table->integer('{{$fkey['fkey']}}')->unsigned();
-            $table->foreign('{{$fkey['fkey']}}')->references('{{ $fkey['pkey'] }}')->on('{{ $fkey['name'] }}')
-            ->onUpdate('cascade')->onDelete('cascade');
-            @endforeach
-            $table->primary(['{{$roleUserPivotTable['fkeys'][0]['fkey']}}', '{{$roleUserPivotTable['fkeys'][1]['fkey']}}']);
         });
 
         // Create table for storing permissions
@@ -63,7 +53,6 @@ class EntrustSetupTables extends Migration
     {
         Schema::dropIfExists('{{ $permission_role_table }}');
         Schema::dropIfExists('{{ $permissions_table }}');
-        Schema::dropIfExists('{{ $roleUserPivotTable['name'] }}');
         Schema::dropIfExists('{{ $roles_table }}');
     }
 }

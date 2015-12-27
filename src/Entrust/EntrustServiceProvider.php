@@ -34,6 +34,8 @@ class EntrustServiceProvider extends ServiceProvider
         // Register commands
         $this->commands('command.entrust.migration');
         $this->commands('command.entrust.classes');
+
+        $this->loadViewsFrom(__DIR__.'/../views', 'entrust');
     }
 
     /**
@@ -64,7 +66,7 @@ class EntrustServiceProvider extends ServiceProvider
     private function registerCommands()
     {
         $this->app->singleton('command.entrust.migration', function ($app) {
-            return new MigrationCommand($app['config']);
+            return new MigrationCommand($app['config'], $app['view'], $app['composer'], $app['files']);
         });
         $this->app->singleton('command.entrust.classes', function ($app) {
             return new ClassCreatorCommand($app['config']);
@@ -76,9 +78,7 @@ class EntrustServiceProvider extends ServiceProvider
      */
     private function mergeConfig()
     {
-        $this->mergeConfigFrom(
-            __DIR__.'/../config/config.php', 'entrust'
-        );
+        $this->mergeConfigFrom(__DIR__.'/../config/config.php', 'entrust');
     }
 
     /**

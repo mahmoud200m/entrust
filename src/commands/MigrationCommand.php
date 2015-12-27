@@ -11,22 +11,43 @@ namespace Zizaco\Entrust;
  */
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Config\Repository as Config;
+use Illuminate\View\Factory as View;
+use Illuminate\Support\Composer;
+use Illuminate\Filesystem\Filesystem;
 
 class MigrationCommand extends Command
 {
+
     /**
      * Configuaration.
      *
-     * @var [type]
+     * @var \Illuminate\Config\Repository
      */
     protected $config;
 
     /**
+     * View
+     * @var \Illuminate\View\Factory
+     */
+    protected $view;
+
+    /**
+     * Composer
+     * @var \Illuminate\Support\Composer
+     */
+    protected $composer;
+
+    /**
+     * Filesystem
+     * @var \Illuminate\Filesystem\Filesystem
+     */
+    protected $filesystem;
+
+    /**
      * Entrust configuration & options.
      *
-     * @var [type]
+     * @var array
      */
     protected $options;
 
@@ -42,11 +63,14 @@ class MigrationCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Creates a migration following the Entrust specifications.';
+    protected $description = 'Creates migrations following the Entrust specifications.';
 
-    public function __construct(Config $config)
+    public function __construct(Config $config, View $view, Composer $composer, Filesystem $filesystem)
     {
         $this->config = $config;
+        $this->view = $view;
+        $this->composer = $composer;
+        $this->filesystem = $filesystem;
         $this->options = $config->get('entrust');
         parent::__construct();
     }
@@ -72,29 +96,20 @@ class MigrationCommand extends Command
         return $this->config->get("auth.providers.{$provider}");
     }
 
-    /**
-     * Execute the console command.
-     */
-    public function fire()
+    public function confirmMigration($options)
     {
-        try {
-            $this->options['provider'] = $this->getAuthProvider();
-            $this->laravel->view->addNamespace('entrust', substr(__DIR__, 0, -8).'views');
-            print_r($this->options);
+        print_r($options);
+        return $this->confirm('Proceed with the migration creation?', 'yes');
+    }
 
-            if ($this->confirm('Proceed with the migration creation?', 'yes')) {
-                $this->line('');
-                $this->info('Creating migration...');
-                $path = base_path('/database/migrations').'/'.date('Y_m_d_His').'_entrust_setup_tables.php';
-                if ($this->createMigration($path)) {
-                    return $this->info('Migration successfully created!');
-                }
-
-                return $this->error("Couldn't create migration.");
-            }
-        } catch (\Exception $e) {
-            $this->error($e->getMessage());
-        }
+    /**
+     * The path of migration file
+     * @param  string $name
+     * @return string
+     */
+    protected function getPath($name)
+    {
+        return base_path('/database/migrations/').date('Y_m_d_His').'_'.$name.'.php';
     }
 
     /**
@@ -104,12 +119,35 @@ class MigrationCommand extends Command
      *
      * @return bool
      */
-    protected function createMigration($migrationFile)
+    public function createMigration($name, $view, $data = array())
     {
-        $provider = $this->options['provider'];
+        $this->line('');
+        $this->info('Creating migration...');
+        $camelName = ucwords(camel_case($name));
+        $data = array_merge([
+            'name' => $camelName
+        ], $data);
+        $output = $this->view->make("entrust::generators.{$view}")->with($data)->render();
+        $path = $this->getPath($name);
+        if (!file_exists($path) && $fs = fopen($path, 'x')) {
+            fwrite($fs, $output);
+            fclose($fs);
+            $this->info('Migration successfully created!');
+            return true;
+        }
+        $this->error("Couldn't create migration.");
+        return false;
+    }
 
+    public function makeMigrationBase($options = array())
+    {
+        return $this->confirmMigration($options) && $this->createMigration('entrust_base', 'migration_base', $options);
+    }
+
+    public function makeMigrationPivot($options = array())
+    {
+        $provider = $options['provider'];
         $driver = $provider['driver'];
-
         if ($driver === 'eloquent' && isset($provider['model'])) {
             $model = with(new $provider['model']());
             $usersTable = [
@@ -131,27 +169,38 @@ class MigrationCommand extends Command
         $roleUserFKeys = array(
             $usersTable,
             [
-                'name' => $this->options['roles_table'],
+                'name' => $options['roles_table'],
                 'pkey' => 'id',
                 'fkey' => 'role_id',
                 'singular' => 'role',
             ],
         );
 
-        $this->options['roleUserPivotTable'] = array(
-            'name' => implode('_', array_pluck($roleUserFKeys, 'singular')),
+        $pivotNames = array_pluck($roleUserFKeys, 'singular');
+        sort($pivotNames);
+
+        $options['roleUserPivotTable'] = array(
+            'name' => implode('_', $pivotNames),
             'fkeys' => $roleUserFKeys,
         );
+        return $this->confirmMigration($options) && $this->createMigration("entrust_pivot_{$options['roleUserPivotTable']['name']}", 'migration_pivot', $options);
+    }
 
-        $output = $this->laravel->view->make('entrust::generators.migration')->with($this->options)->render();
-
-        if (!file_exists($migrationFile) && $fs = fopen($migrationFile, 'x')) {
-            fwrite($fs, $output);
-            fclose($fs);
-
-            return true;
+    /**
+     * Execute the console command.
+     */
+    public function fire()
+    {
+        try {
+            $this->makeMigrationBase($this->options);
+            $provider = $this->getAuthProvider();
+            $this->makeMigrationPivot([
+                'provider' => $provider,
+                'roles_table' => $this->options['roles_table']
+            ]);
+            $this->composer->dumpAutoloads();
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
         }
-
-        return false;
     }
 }
