@@ -39,10 +39,10 @@ class ClassCreatorCommand extends Command
         $roleModel = Config::get('entrust.role');
         $permissionModel = Config::get('entrust.permission');
 
-        $roleModelName = explode('/', $roleModel);
+        $roleModelName = explode('\\', $roleModel);
         $roleModelName = end($roleModelName);
 
-        $permissionModelName = explode('/', $permissionModel);
+        $permissionModelName = explode('\\', $permissionModel);
         $permissionModelName = end($permissionModelName);
 
         $classes = compact('roleModelName', 'permissionModelName');
