@@ -11,6 +11,27 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Entrust Scope Model
+    |--------------------------------------------------------------------------
+    |
+    | This is the Scope model used by Entrust to create correct relations.  Update
+    | the scope if it is in a different namespace.
+    |
+    */
+    'scope' => 'Livit\Build\Scope',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Entrust Scopes Table
+    |--------------------------------------------------------------------------
+    |
+    | This is the scopes table used by Entrust to save scopes to the database.
+    |
+    */
+    'scopes_table' => 'scopes',
+
+    /*
+    |--------------------------------------------------------------------------
     | Entrust Role Model
     |--------------------------------------------------------------------------
     |
@@ -18,7 +39,7 @@ return [
     | the role if it is in a different namespace.
     |
     */
-    'role' => 'App\Role',
+    'role' => 'Livit\Build\Role',
 
     /*
     |--------------------------------------------------------------------------
@@ -39,7 +60,7 @@ return [
     | Update the permission if it is in a different namespace.
     |
     */
-    'permission' => 'App\Permission',
+    'permission' => 'Livit\Build\Permission',
 
     /*
     |--------------------------------------------------------------------------
