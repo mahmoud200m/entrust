@@ -36,6 +36,9 @@ class EntrustServiceProvider extends ServiceProvider
         $this->commands('command.entrust.classes');
 
         $this->loadViewsFrom(__DIR__.'/../views', 'entrust');
+
+        // Register blade directives
+        $this->bladeDirectives();
     }
 
     /**
@@ -48,6 +51,43 @@ class EntrustServiceProvider extends ServiceProvider
         $this->registerCommands();
 
         $this->mergeConfig();
+    }
+
+    /**
+     * Register the blade directives
+     *
+     * @return void
+     */
+    private function bladeDirectives()
+    {
+        // Call to Entrust::hasRole
+        \Blade::directive('role', function($expression) {
+            return "<?php if (\\Entrust::hasRole{$expression}) : ?>";
+        });
+        \Blade::directive('endrole', function($expression) {
+            return "<?php endif; // Entrust::hasRole ?>";
+        });
+        // Call to Entrust::hasScope
+        \Blade::directive('scope', function($expression) {
+            return "<?php if (\\Entrust::hasScope{$expression}) : ?>";
+        });
+        \Blade::directive('endscope', function($expression) {
+            return "<?php endif; // Entrust::hasScope ?>";
+        });
+        // Call to Entrust::can
+        \Blade::directive('permission', function($expression) {
+            return "<?php if (\\Entrust::can{$expression}) : ?>";
+        });
+        \Blade::directive('endpermission', function($expression) {
+            return "<?php endif; // Entrust::can ?>";
+        });
+        // Call to Entrust::ability
+        \Blade::directive('ability', function($expression) {
+            return "<?php if (\\Entrust::ability{$expression}) : ?>";
+        });
+        \Blade::directive('endability', function($expression) {
+            return "<?php endif; // Entrust::ability ?>";
+        });
     }
 
     /**
