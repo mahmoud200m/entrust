@@ -26,6 +26,16 @@ trait EntrustUserTrait
     }
 
     /**
+     * Many-to-Many relations with Role.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function scopes()
+    {
+        return $this->belongsToMany(Config::get('entrust.scope'));
+    }
+
+    /**
      * Boot the user model
      * Attach event listener to remove the many-to-many records when trying to delete
      * Will NOT delete any records if the user model uses soft deletes.
@@ -43,6 +53,42 @@ trait EntrustUserTrait
 
             return true;
         });
+    }
+
+    /**
+     * Checks if the user has a scope by its name.
+     *
+     * @param string|array $name       Role name or array of role names.
+     * @param bool         $requireAll All roles in the array are required.
+     *
+     * @return bool
+     */
+    public function hasScope($name, $requireAll = false)
+    {
+        if (is_array($name)) {
+            foreach ($name as $scopeName) {
+                $hasScope = $this->hasScope($scopeName);
+
+                if ($hasScope && !$requireAll) {
+                    return true;
+                } elseif (!$hasScope && $requireAll) {
+                    return false;
+                }
+            }
+
+            // If we've made it this far and $requireAll is FALSE, then NONE of the roles were found
+            // If we've made it this far and $requireAll is TRUE, then ALL of the roles were found.
+            // Return the value of $requireAll;
+            return $requireAll;
+        } else {
+            foreach ($this->scopes as $scope) {
+                if ($scope->name == $name) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -187,6 +233,42 @@ trait EntrustUserTrait
         } else {
             return [$validateAll, ['roles' => $checkedRoles, 'permissions' => $checkedPermissions]];
         }
+    }
+
+    /**
+     * Alias to eloquent many-to-many relation's attach() method.
+     *
+     * @param mixed $role
+     */
+    public function attachScope($scope)
+    {
+        if (is_object($scope)) {
+            $scope = $scope->getKey();
+        }
+
+        if (is_array($scope)) {
+            $scope = $scope['id'];
+        }
+
+        $this->scopes()->attach($scope);
+    }
+
+    /**
+     * Alias to eloquent many-to-many relation's detach() method.
+     *
+     * @param mixed $role
+     */
+    public function detachScope($scope)
+    {
+        if (is_object($scope)) {
+            $scope = $scope->getKey();
+        }
+
+        if (is_array($scope)) {
+            $scope = $scope['id'];
+        }
+
+        $this->scopes()->detach($scope);
     }
 
     /**
