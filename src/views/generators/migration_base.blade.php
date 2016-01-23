@@ -42,6 +42,31 @@ class {{$name}} extends Migration
 
             $table->primary(['permission_id', 'role_id']);
         });
+
+        Schema::create('{{ $scopes_table }}', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name')->unique();
+            $table->string('display_name')->nullable();
+            $table->string('description')->nullable();
+            $table->timestamps();
+        });
+
+        // Create table for associating scopes to users (Many-to-Many)
+        Schema::create('{{ $scope_user }}', function (Blueprint $table) {
+            $table->integer('user_id')->unsigned();
+            $table->foreign('user_id')
+                  ->references('id')
+                  ->on('users')
+                  ->onUpdate('cascade')
+                  ->onDelete('cascade');
+            $table->integer('scope_id')->unsigned();
+            $table->foreign('scope_id')
+                  ->references('id')
+                  ->on('scopes')
+                  ->onUpdate('cascade')
+                  ->onDelete('cascade');
+            $table->primary(['user_id', 'scope_id']);
+        });
     }
 
     /**
@@ -54,5 +79,7 @@ class {{$name}} extends Migration
         Schema::dropIfExists('{{ $permission_role_table }}');
         Schema::dropIfExists('{{ $permissions_table }}');
         Schema::dropIfExists('{{ $roles_table }}');
+        Schema::dropIfExists('{{ $scopes_table }}');
+        Schema::dropIfExists('{{ $scope_user_table }}');
     }
 }
