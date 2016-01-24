@@ -52,7 +52,7 @@ class {{$name}} extends Migration
         });
 
         // Create table for associating scopes to users (Many-to-Many)
-        Schema::create('{{ $scope_user }}', function (Blueprint $table) {
+        Schema::create('{{ $scope_user_table }}', function (Blueprint $table) {
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')
                   ->references('id')
