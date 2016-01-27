@@ -153,11 +153,22 @@ trait EntrustUserTrait
             // Return the value of $requireAll;
             return $requireAll;
         } else {
+
             foreach ($this->roles as $role) {
                 // Validate against the Permission table
                 foreach ($role->perms as $perm) {
-                    if ($perm->name == $permission) {
-                        return true;
+                    if ($perm->name === $permission) {
+                        if (count($perm->scopes)) {
+                            foreach ($perm->scopes as $scope) {
+                                foreach ($this->scopes as $userScope) {
+                                    if ($scope->name === $userScope->name) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        } else {
+                            return true;
+                        }
                     }
                 }
             }

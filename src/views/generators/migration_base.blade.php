@@ -43,6 +43,23 @@ class {{$name}} extends Migration
             $table->primary(['permission_id', 'role_id']);
         });
 
+        // Create table for associating scopes to permissions (Many-to-Many)
+        Schema::create('{{ $permission_scope_table }}', function (Blueprint $table) {
+            $table->integer('scope_id')->unsigned();
+            $table->foreign('scope_id')
+                  ->references('id')
+                  ->on('scopes')
+                  ->onUpdate('cascade')
+                  ->onDelete('cascade');
+            $table->integer('permission_id')->unsigned();
+            $table->foreign('permission_id')
+                  ->references('id')
+                  ->on('permissions')
+                  ->onUpdate('cascade')
+                  ->onDelete('cascade');
+            $table->primary(['scope_id', 'permission_id']);
+        });
+
         Schema::create('{{ $scopes_table }}', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->unique();

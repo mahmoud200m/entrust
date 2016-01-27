@@ -25,6 +25,17 @@ trait EntrustScopeTrait
     }
 
     /**
+     * Many-to-Many relations with the permission model.
+     * Named "perms" for backwards compatibility. Also because "perms" is short and sweet.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function perms()
+    {
+        return $this->belongsToMany(Config::get('entrust.permission'), Config::get('entrust.permission_scope_table'));
+    }
+
+    /**
      * Boot the role model
      * Attach event listener to remove the many-to-many records when trying to delete
      * Will NOT delete any records if the role model uses soft deletes.

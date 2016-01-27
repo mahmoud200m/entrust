@@ -94,4 +94,15 @@ return [
     */
     'permission_role_table' => 'permission_role',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Entrust permission_scope Table
+    |--------------------------------------------------------------------------
+    |
+    | This is the permission_scope table used by Entrust to save relationship
+    | between permissions and scopes to the database.
+    |
+    */
+    'permission_scope_table' => 'permission_scope',
+
 ];
