@@ -154,23 +154,52 @@ trait EntrustUserTrait
             return $requireAll;
         } else {
 
+            $userRoles = $this->roles;
+            $userGroups = $this->groups;
+            $userScopes = $this->scopes;
+
+            $permRoles = [];
+            $permScopes = [];
+            $permGroups = [];
+
             foreach ($this->roles as $role) {
                 // Validate against the Permission table
                 foreach ($role->perms as $perm) {
                     if ($perm->name === $permission) {
+                        array_push($permRoles, $role);
                         if (count($perm->scopes)) {
                             foreach ($perm->scopes as $scope) {
-                                foreach ($this->scopes as $userScope) {
-                                    if ($scope->name === $userScope->name) {
-                                        return true;
-                                    }
-                                }
+                                array_push($permScopes, $scope);
                             }
-                        } else {
-                            return true;
+                        }
+                        if (count($perm->groups)) {
+                            foreach ($perm->groups as $group) {
+                                array_push($permGroups, $group);
+                            }
                         }
                     }
                 }
+            }
+
+            $permRoles = collect($permRoles);
+            $permScopes = collect($permScopes);
+            $permGroups = collect($permGroups);
+
+            $rolesIntersect = $userRoles->intersect($permRoles);
+            $scopesIntersect = $userScopes->intersect($permScopes);
+            $groupsIntersect = $userGroups->intersect($permGroups);
+
+            // If permission and current user share roles
+            if (count($rolesIntersect)) {
+                // If permission has any scope and user doesn't
+                if ( count($permScopes) && !count($scopesIntersect)) {
+                    return false;
+                }
+                // If permission has any group and user doesn't
+                if ( count($permGroups) && !count($groupsIntersect)) {
+                    return false;
+                }
+                return true;
             }
         }
 

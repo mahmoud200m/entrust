@@ -8,7 +8,7 @@ namespace Zizaco\Entrust\Contracts;
  *
  * @license MIT
  */
-interface EntrustScopeInterface
+interface EntrustGroupInterface
 {
     /**
      * Many-to-Many relations with the user model.

@@ -30,6 +30,23 @@ class {{$name}} extends Migration
             $table->timestamps();
         });
 
+        Schema::create('{{ $scopes_table }}', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name')->unique();
+            $table->string('display_name')->nullable();
+            $table->string('description')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('{{ $groups_table }}', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('slug');
+            $table->string('email')->unique();
+            $table->string('brand_color');
+            $table->timestamps();
+        });
+
         // Create table for associating permissions to roles (Many-to-Many)
         Schema::create('{{ $permission_role_table }}', function (Blueprint $table) {
             $table->integer('permission_id')->unsigned();
@@ -60,12 +77,36 @@ class {{$name}} extends Migration
             $table->primary(['scope_id', 'permission_id']);
         });
 
-        Schema::create('{{ $scopes_table }}', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name')->unique();
-            $table->string('display_name')->nullable();
-            $table->string('description')->nullable();
-            $table->timestamps();
+        Schema::create('{{ $permission_group_table }}', function (Blueprint $table) {
+            $table->foreign('permission_id')
+                  ->references('id')
+                  ->on('permissions')
+                  ->onUpdate('cascade')
+                  ->onDelete('cascade');
+            $table->primary(['group_id', 'permission_id']);
+            $table->integer('group_id')->unsigned();
+            $table->foreign('group_id')
+                  ->references('id')
+                  ->on('groups')
+                  ->onUpdate('cascade')
+                  ->onDelete('cascade');
+            $table->integer('permission_id')->unsigned();
+        });
+
+        Schema::create('{{ $group_user_table }}', function (Blueprint $table) {
+            $table->integer('user_id')->unsigned();
+            $table->foreign('user_id')
+                  ->references('id')
+                  ->on('users')
+                  ->onUpdate('cascade')
+                  ->onDelete('cascade');
+            $table->integer('group_id')->unsigned();
+            $table->foreign('group_id')
+                  ->references('id')
+                  ->on('groups')
+                  ->onUpdate('cascade')
+                  ->onDelete('cascade');
+            $table->primary(['user_id', 'group_id']);
         });
 
         // Create table for associating scopes to users (Many-to-Many)
@@ -93,10 +134,14 @@ class {{$name}} extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('{{ $permission_role_table }}');
         Schema::dropIfExists('{{ $permissions_table }}');
+        Schema::dropIfExists('{{ $permission_role_table }}');
+        Schema::dropIfExists('{{ $permission_group_table }}');
+        Schema::dropIfExists('{{ $permission_scope_table }}');
         Schema::dropIfExists('{{ $roles_table }}');
         Schema::dropIfExists('{{ $scopes_table }}');
         Schema::dropIfExists('{{ $scope_user_table }}');
+        Schema::dropIfExists('{{ $groups_table }}');
+        Schema::dropIfExists('{{ $group_user_table }}');
     }
 }

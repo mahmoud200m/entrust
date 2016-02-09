@@ -23,6 +23,7 @@ trait EntrustPermissionTrait
     {
         return $this->belongsToMany(Config::get('entrust.role'), Config::get('entrust.permission_role_table'));
     }
+
     /**
      * Many-to-Many relations with scope model.
      *
@@ -31,6 +32,16 @@ trait EntrustPermissionTrait
     public function scopes()
     {
         return $this->belongsToMany(Config::get('entrust.scope'), Config::get('entrust.permission_scope_table'));
+    }
+
+    /**
+     * Many-to-Many relations with group model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function groups()
+    {
+        return $this->belongsToMany(Config::get('entrust.group'), Config::get('entrust.permission_group_table'));
     }
 
     /**
