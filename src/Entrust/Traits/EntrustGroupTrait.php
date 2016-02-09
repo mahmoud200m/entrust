@@ -21,7 +21,7 @@ trait EntrustGroupTrait
      */
     public function users()
     {
-        return $this->belongsToMany(Config::get('auth.model'));
+        return $this->belongsToMany(Config::get('auth.providers.users.model'));
     }
 
     /**
