@@ -10,8 +10,8 @@ namespace Zizaco\Entrust;
  * @package Zizaco\Entrust
  */
 
-use Zizaco\Entrust\Contracts\EntrustScopeInterface;
-use Zizaco\Entrust\Traits\EntrustScopeTrait;
+use Zizaco\Entrust\Contracts\EntrustGroupInterface;
+use Zizaco\Entrust\Traits\EntrustGroupTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 

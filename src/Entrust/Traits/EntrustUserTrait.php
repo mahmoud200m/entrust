@@ -26,13 +26,23 @@ trait EntrustUserTrait
     }
 
     /**
-     * Many-to-Many relations with Role.
+     * Many-to-Many relations with Scope.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function scopes()
     {
         return $this->belongsToMany(Config::get('entrust.scope'));
+    }
+
+    /**
+     * Many-to-Many relations with Group.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function groups()
+    {
+        return $this->belongsToMany(Config::get('entrust.group'));
     }
 
     /**
