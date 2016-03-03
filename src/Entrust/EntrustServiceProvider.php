@@ -67,13 +67,6 @@ class EntrustServiceProvider extends ServiceProvider
         \Blade::directive('endrole', function($expression) {
             return "<?php endif; // Entrust::hasRole ?>";
         });
-        // Call to Entrust::hasScope
-        \Blade::directive('scope', function($expression) {
-            return "<?php if (\\Entrust::hasScope{$expression}) : ?>";
-        });
-        \Blade::directive('endscope', function($expression) {
-            return "<?php endif; // Entrust::hasScope ?>";
-        });
         // Call to Entrust::can
         \Blade::directive('permission', function($expression) {
             return "<?php if (\\Entrust::can{$expression}) : ?>";

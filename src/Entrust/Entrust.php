@@ -28,22 +28,6 @@ class Entrust
     }
 
     /**
-     * Checks if the current user has a scope by its name.
-     *
-     * @param string $name Scope name.
-     *
-     * @return bool
-     */
-    public function hasScope($scope, $requireAll = false)
-    {
-        if ($user = $this->user()) {
-            return $user->hasScope($scope, $requireAll);
-        }
-
-        return false;
-    }
-
-    /**
      * Checks if the current user has a role by its name.
      *
      * @param string $name Role name.

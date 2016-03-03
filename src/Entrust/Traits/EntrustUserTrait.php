@@ -26,16 +26,6 @@ trait EntrustUserTrait
     }
 
     /**
-     * Many-to-Many relations with Scope.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function scopes()
-    {
-        return $this->belongsToMany(Config::get('entrust.scope'));
-    }
-
-    /**
      * Many-to-Many relations with Group.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -63,42 +53,6 @@ trait EntrustUserTrait
 
             return true;
         });
-    }
-
-    /**
-     * Checks if the user has a scope by its name.
-     *
-     * @param string|array $name       Role name or array of role names.
-     * @param bool         $requireAll All roles in the array are required.
-     *
-     * @return bool
-     */
-    public function hasScope($name, $requireAll = false)
-    {
-        if (is_array($name)) {
-            foreach ($name as $scopeName) {
-                $hasScope = $this->hasScope($scopeName);
-
-                if ($hasScope && !$requireAll) {
-                    return true;
-                } elseif (!$hasScope && $requireAll) {
-                    return false;
-                }
-            }
-
-            // If we've made it this far and $requireAll is FALSE, then NONE of the roles were found
-            // If we've made it this far and $requireAll is TRUE, then ALL of the roles were found.
-            // Return the value of $requireAll;
-            return $requireAll;
-        } else {
-            foreach ($this->scopes as $scope) {
-                if ($scope->name == $name) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     /**
@@ -166,10 +120,8 @@ trait EntrustUserTrait
 
             $userRoles = $this->roles;
             $userGroups = $this->groups;
-            $userScopes = $this->scopes;
 
             $permRoles = [];
-            $permScopes = [];
             $permGroups = [];
 
             foreach ($this->roles as $role) {
@@ -177,11 +129,6 @@ trait EntrustUserTrait
                 foreach ($role->perms as $perm) {
                     if ($perm->name === $permission) {
                         array_push($permRoles, $role);
-                        if (count($perm->scopes)) {
-                            foreach ($perm->scopes as $scope) {
-                                array_push($permScopes, $scope);
-                            }
-                        }
                         if (count($perm->groups)) {
                             foreach ($perm->groups as $group) {
                                 array_push($permGroups, $group);
@@ -192,19 +139,13 @@ trait EntrustUserTrait
             }
 
             $permRoles = collect($permRoles);
-            $permScopes = collect($permScopes);
             $permGroups = collect($permGroups);
 
             $rolesIntersect = $userRoles->intersect($permRoles);
-            $scopesIntersect = $userScopes->intersect($permScopes);
             $groupsIntersect = $userGroups->intersect($permGroups);
 
             // If permission and current user share roles
             if (count($rolesIntersect)) {
-                // If permission has any scope and user doesn't
-                if ( count($permScopes) && !count($scopesIntersect)) {
-                    return false;
-                }
                 // If permission has any group and user doesn't
                 if ( count($permGroups) && !count($groupsIntersect)) {
                     return false;
@@ -283,42 +224,6 @@ trait EntrustUserTrait
         } else {
             return [$validateAll, ['roles' => $checkedRoles, 'permissions' => $checkedPermissions]];
         }
-    }
-
-    /**
-     * Alias to eloquent many-to-many relation's attach() method.
-     *
-     * @param mixed $role
-     */
-    public function attachScope($scope)
-    {
-        if (is_object($scope)) {
-            $scope = $scope->getKey();
-        }
-
-        if (is_array($scope)) {
-            $scope = $scope['id'];
-        }
-
-        $this->scopes()->attach($scope);
-    }
-
-    /**
-     * Alias to eloquent many-to-many relation's detach() method.
-     *
-     * @param mixed $role
-     */
-    public function detachScope($scope)
-    {
-        if (is_object($scope)) {
-            $scope = $scope->getKey();
-        }
-
-        if (is_array($scope)) {
-            $scope = $scope['id'];
-        }
-
-        $this->scopes()->detach($scope);
     }
 
     /**

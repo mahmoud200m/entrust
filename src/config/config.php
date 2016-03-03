@@ -11,37 +11,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Entrust Scope Model
-    |--------------------------------------------------------------------------
-    |
-    | This is the Scope model used by Entrust to create correct relations.  Update
-    | the scope if it is in a different namespace.
-    |
-    */
-    'scope' => 'Livit\Build\Scope',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Entrust Scopes Table
-    |--------------------------------------------------------------------------
-    |
-    | This is the scopes table used by Entrust to save scopes to the database.
-    |
-    */
-    'scopes_table' => 'scopes',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Entrust scope_user Table
-    |--------------------------------------------------------------------------
-    |
-    | This is the scopes table used by Entrust to save scopes to the database.
-    |
-    */
-    'scope_user_table' => 'scope_user',
-
-    /*
-    |--------------------------------------------------------------------------
     | Entrust Group Model
     |--------------------------------------------------------------------------
     |
@@ -136,16 +105,5 @@ return [
     |
     */
     'permission_role_table' => 'permission_role',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Entrust permission_scope Table
-    |--------------------------------------------------------------------------
-    |
-    | This is the permission_scope table used by Entrust to save relationship
-    | between permissions and scopes to the database.
-    |
-    */
-    'permission_scope_table' => 'permission_scope',
 
 ];

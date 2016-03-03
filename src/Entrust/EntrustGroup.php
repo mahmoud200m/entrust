@@ -4,7 +4,7 @@ namespace Zizaco\Entrust;
 
 /*
  * This file is part of Entrust,
- * a Scope & permission management solution for Laravel.
+ * a permission management solution for Laravel.
  *
  * @license MIT
  * @package Zizaco\Entrust
